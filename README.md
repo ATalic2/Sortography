@@ -6,12 +6,18 @@ Sortography helps you sort a folder of photos into the right folders quickly. Pr
 
 Download the latest release for your computer from the [Releases](../../releases) page.
 
-- **Windows:** download the `win-x64.zip` file.
-- **macOS Intel:** download the `osx-x64.tar.gz` file.
-- **macOS Apple silicon:** download the `osx-arm64.tar.gz` file.
-- **Linux:** download the `linux-x64.tar.gz` file.
+- **Windows:** download `Sortography-<version>-Setup.exe` and run the installer. The `win-x64.zip` file is the portable alternative.
+- **macOS Intel:** download the `osx-x64.dmg` file, open it, and drag Sortography into Applications.
+- **macOS Apple silicon:** download the `osx-arm64.dmg` file, open it, and drag Sortography into Applications.
+- **Ubuntu 24.04 x64:** download the `linux-x64.deb` file and open it with your software installer. A `linux-x64.tar.gz` portable archive is also available.
 
-Extract the downloaded archive, then open the Sortography application inside it. No separate .NET installation is required.
+No separate .NET installation is required. For the Windows portable ZIP, extract the entire archive and open `Sortography.exe`. For the Linux portable archive, extract it and run `./Sortography` from that folder; system libraries are still required.
+
+Current releases are unsigned on Windows and not notarized on macOS, so your system may warn or block installation. See the release's installation notes for details.
+
+To update, close Sortography and install the newer version in the same location.
+
+Maintainers: see [Making a release](RELEASING.md) for testing packages and publishing a version.
 
 ## Sort Photos
 

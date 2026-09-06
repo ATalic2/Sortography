@@ -1,12 +1,17 @@
 name: Release
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - "v*.*.*"
 
 permissions:
   contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   build-release:
@@ -18,7 +23,7 @@ jobs:
         include:
           - os: windows-latest
             rid: win-x64
-          - os: ubuntu-latest
+          - os: ubuntu-24.04
             rid: linux-x64
           - os: macos-latest
             rid: osx-x64
@@ -37,7 +42,10 @@ jobs:
         id: version
         shell: bash
         run: |
-          version="${GITHUB_REF_NAME#v}"
+          version="0.0.0-preview.${GITHUB_RUN_NUMBER}"
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            version="${GITHUB_REF_NAME#v}"
+          fi
           if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
             echo "Expected a semantic version tag such as v1.2.3 or v1.2.3-beta.1" >&2
             exit 1
@@ -63,6 +71,11 @@ jobs:
       - name: Test
         run: dotnet test tests/Sortography.Tests/Sortography.Tests.csproj --configuration Release --no-build --verbosity normal
 
+      - name: Set up Inno Setup
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: choco install innosetup --no-progress --yes
+
       - name: Publish version ${{ steps.version.outputs.number }}
         run: >-
           dotnet publish Sortography.csproj
@@ -79,8 +92,17 @@ jobs:
       - name: Package Windows build
         if: runner.os == 'Windows'
         shell: pwsh
+        env:
+          APP_VERSION: ${{ steps.version.outputs.number }}
         run: |
           New-Item -ItemType Directory -Force -Path packages | Out-Null
+          Copy-Item LICENSE "publish/${{ matrix.rid }}/LICENSE.txt"
+          $compiler = Get-ChildItem -Path "${env:ProgramFiles(x86)}\Inno Setup*\ISCC.exe", "$env:ProgramFiles\Inno Setup*\ISCC.exe" -ErrorAction SilentlyContinue |
+            Sort-Object FullName -Descending | Select-Object -First 1
+          if (!$compiler) { throw "Inno Setup compiler was not found." }
+          & $compiler.FullName installer\Sortography.iss
+          if ($LASTEXITCODE -ne 0) { throw "Installer compilation failed ($LASTEXITCODE)." }
+          if (!(Test-Path "packages/Sortography-$env:APP_VERSION-Setup.exe")) { throw "Installer is missing." }
           Compress-Archive `
             -Path "publish/${{ matrix.rid }}/*" `
             -DestinationPath "packages/Sortography-${{ steps.version.outputs.number }}-${{ matrix.rid }}.zip"
@@ -88,10 +110,10 @@ jobs:
       - name: Package Unix build
         if: runner.os != 'Windows'
         shell: bash
+        env:
+          APP_VERSION: ${{ steps.version.outputs.number }}
         run: |
-          mkdir -p packages
-          tar -C "publish/${{ matrix.rid }}" -czf \
-            "packages/Sortography-${{ steps.version.outputs.number }}-${{ matrix.rid }}.tar.gz" .
+          bash installer/package-unix.sh "${{ matrix.rid }}" "$APP_VERSION"
 
       - name: Upload release package
         uses: actions/upload-artifact@v7
@@ -102,12 +124,16 @@ jobs:
 
   create-release:
     name: Create GitHub Release
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
     needs: build-release
     runs-on: ubuntu-latest
     permissions:
       contents: write
 
     steps:
+      - name: Check out release instructions
+        uses: actions/checkout@v6
+
       - name: Download release packages
         uses: actions/download-artifact@v8
         with:
@@ -119,6 +145,10 @@ jobs:
         shell: bash
         run: |
           cd release-assets
+          version="${GITHUB_REF_NAME#v}"
+          for suffix in Setup.exe win-x64.zip osx-x64.dmg osx-arm64.dmg linux-x64.deb linux-x64.tar.gz; do
+            test -s "Sortography-$version-$suffix"
+          done
           sha256sum Sortography-* > SHA256SUMS.txt
 
       - name: Create release for ${{ github.ref_name }}
@@ -127,7 +157,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          release_flags=(--verify-tag --title "Sortography ${GITHUB_REF_NAME}")
+          release_flags=(--verify-tag --title "Sortography ${GITHUB_REF_NAME}" --notes-file installer/release-notes.md --generate-notes)
           if [[ "$GITHUB_REF_NAME" == *-* ]]; then
             release_flags+=(--prerelease)
           fi
