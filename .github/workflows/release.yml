@@ -127,7 +127,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          release_flags=(--verify-tag --generate-notes --title "Sortography ${GITHUB_REF_NAME}")
+          release_flags=(--verify-tag --title "Sortography ${GITHUB_REF_NAME}")
           if [[ "$GITHUB_REF_NAME" == *-* ]]; then
             release_flags+=(--prerelease)
           fi
