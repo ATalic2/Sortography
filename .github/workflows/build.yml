@@ -1,0 +1,66 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: ${{ matrix.artifact }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            rid: win-x64
+            artifact: sortography-windows-x64
+          - os: ubuntu-latest
+            rid: linux-x64
+            artifact: sortography-linux-x64
+          - os: macos-latest
+            rid: osx-x64
+            artifact: sortography-macos-x64
+          - os: macos-latest
+            rid: osx-arm64
+            artifact: sortography-macos-arm64
+
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: true
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Restore
+        run: dotnet restore tests/Sortography.Tests/Sortography.Tests.csproj
+
+      - name: Restore application for ${{ matrix.rid }}
+        run: dotnet restore Sortography.csproj --runtime ${{ matrix.rid }}
+
+      - name: Build
+        run: dotnet build tests/Sortography.Tests/Sortography.Tests.csproj --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test tests/Sortography.Tests/Sortography.Tests.csproj --configuration Release --no-build --verbosity normal
+
+      - name: Publish ${{ matrix.rid }}
+        run: dotnet publish Sortography.csproj --configuration Release --runtime ${{ matrix.rid }} --self-contained true --no-restore --output artifacts/${{ matrix.artifact }}
+
+      - name: Upload ${{ matrix.artifact }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.artifact }}
+          path: artifacts/${{ matrix.artifact }}
+          if-no-files-found: error

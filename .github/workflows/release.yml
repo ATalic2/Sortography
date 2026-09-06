@@ -1,0 +1,134 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: read
+
+jobs:
+  build-release:
+    name: Build ${{ matrix.rid }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            rid: win-x64
+          - os: ubuntu-latest
+            rid: linux-x64
+          - os: macos-latest
+            rid: osx-x64
+          - os: macos-latest
+            rid: osx-arm64
+
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: true
+
+    steps:
+      - name: Check out tagged source
+        uses: actions/checkout@v6
+
+      - name: Read version from tag
+        id: version
+        shell: bash
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "Expected a semantic version tag such as v1.2.3 or v1.2.3-beta.1" >&2
+            exit 1
+          fi
+          numeric_version="${version%%-*}"
+          echo "number=$version" >> "$GITHUB_OUTPUT"
+          echo "assembly=$numeric_version.0" >> "$GITHUB_OUTPUT"
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Restore tests
+        run: dotnet restore tests/Sortography.Tests/Sortography.Tests.csproj
+
+      - name: Restore application for ${{ matrix.rid }}
+        run: dotnet restore Sortography.csproj --runtime ${{ matrix.rid }}
+
+      - name: Build
+        run: dotnet build tests/Sortography.Tests/Sortography.Tests.csproj --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test tests/Sortography.Tests/Sortography.Tests.csproj --configuration Release --no-build --verbosity normal
+
+      - name: Publish version ${{ steps.version.outputs.number }}
+        run: >-
+          dotnet publish Sortography.csproj
+          --configuration Release
+          --runtime ${{ matrix.rid }}
+          --self-contained true
+          --no-restore
+          --output publish/${{ matrix.rid }}
+          -p:Version=${{ steps.version.outputs.number }}
+          -p:AssemblyVersion=${{ steps.version.outputs.assembly }}
+          -p:FileVersion=${{ steps.version.outputs.assembly }}
+          -p:InformationalVersion=${{ steps.version.outputs.number }}
+
+      - name: Package Windows build
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path packages | Out-Null
+          Compress-Archive `
+            -Path "publish/${{ matrix.rid }}/*" `
+            -DestinationPath "packages/Sortography-${{ steps.version.outputs.number }}-${{ matrix.rid }}.zip"
+
+      - name: Package Unix build
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          mkdir -p packages
+          tar -C "publish/${{ matrix.rid }}" -czf \
+            "packages/Sortography-${{ steps.version.outputs.number }}-${{ matrix.rid }}.tar.gz" .
+
+      - name: Upload release package
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-${{ matrix.rid }}
+          path: packages/*
+          if-no-files-found: error
+
+  create-release:
+    name: Create GitHub Release
+    needs: build-release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download release packages
+        uses: actions/download-artifact@v8
+        with:
+          pattern: release-*
+          path: release-assets
+          merge-multiple: true
+
+      - name: Generate checksums
+        shell: bash
+        run: |
+          cd release-assets
+          sha256sum Sortography-* > SHA256SUMS.txt
+
+      - name: Create release for ${{ github.ref_name }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          release_flags=(--verify-tag --generate-notes --title "Sortography ${GITHUB_REF_NAME}")
+          if [[ "$GITHUB_REF_NAME" == *-* ]]; then
+            release_flags+=(--prerelease)
+          fi
+          gh release create "$GITHUB_REF_NAME" release-assets/* "${release_flags[@]}"

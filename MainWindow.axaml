@@ -1,0 +1,129 @@
+<Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="using:Sortography"
+        x:Class="Sortography.MainWindow" Title="Sortography" Icon="/Assets/icon.png"
+        Width="1440" Height="900" MinWidth="960" MinHeight="640" Background="#111315" FontSize="12">
+  <Window.Resources>
+    <SolidColorBrush x:Key="PanelBrush">#171A1D</SolidColorBrush><SolidColorBrush x:Key="LineBrush">#2A2E32</SolidColorBrush>
+    <SolidColorBrush x:Key="AccentBrush">#EF8F5A</SolidColorBrush><SolidColorBrush x:Key="MutedBrush">#8E949A</SolidColorBrush>
+    <DrawingBrush x:Key="CheckerBrush" TileMode="Tile" SourceRect="0,0,20,20" DestinationRect="0,0,20,20" Stretch="None">
+      <DrawingBrush.Drawing>
+        <DrawingGroup>
+          <GeometryDrawing Brush="#0C0F11" Geometry="M 0,0 L 20,0 20,20 0,20 Z"/>
+          <GeometryDrawing Brush="#121619" Geometry="M 0,0 L 10,0 10,10 0,10 Z M 10,10 L 20,10 20,20 10,20 Z"/>
+        </DrawingGroup>
+      </DrawingBrush.Drawing>
+    </DrawingBrush>
+  </Window.Resources>
+  <Window.Styles>
+    <Style Selector="Button"><Setter Property="HorizontalContentAlignment" Value="Center"/><Setter Property="VerticalContentAlignment" Value="Center"/></Style>
+    <Style Selector="Button.tool"><Setter Property="Height" Value="34"/><Setter Property="Padding" Value="12,0"/><Setter Property="Background" Value="Transparent"/><Setter Property="Foreground" Value="#BEC2C5"/><Setter Property="CornerRadius" Value="5"/><Setter Property="FontSize" Value="12"/></Style>
+    <Style Selector="Button.tool StackPanel"><Setter Property="VerticalAlignment" Value="Center"/></Style>
+    <Style Selector="Button.tool TextBlock"><Setter Property="VerticalAlignment" Value="Center"/></Style>
+    <Style Selector="Button.tool:pointerover /template/ ContentPresenter"><Setter Property="Background" Value="#292D31"/></Style>
+    <Style Selector="Button.primary"><Setter Property="Background" Value="#EF8F5A"/><Setter Property="Foreground" Value="#17120F"/><Setter Property="FontWeight" Value="SemiBold"/></Style>
+    <Style Selector="TextBlock.section"><Setter Property="FontSize" Value="12"/><Setter Property="FontWeight" Value="Bold"/><Setter Property="Foreground" Value="#AEB3B7"/><Setter Property="LetterSpacing" Value="1"/></Style>
+    <Style Selector="TreeView"><Setter Property="Background" Value="Transparent"/><Setter Property="BorderThickness" Value="0"/><Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/></Style>
+    <Style Selector="TreeViewItem"><Setter Property="IsExpanded" Value="{ReflectionBinding IsExpanded, Mode=TwoWay}"/><Setter Property="MinHeight" Value="33"/></Style>
+    <Style Selector="Border.folderRow"><Setter Property="Height" Value="32"/><Setter Property="Padding" Value="4,0"/><Setter Property="CornerRadius" Value="3"/><Setter Property="ClipToBounds" Value="True"/></Style>
+    <Style Selector="Border.folderRow:pointerover"><Setter Property="Background" Value="#23272B"/></Style>
+    <Style Selector="Border.sourceFolder"><Setter Property="BorderBrush" Value="Transparent"/><Setter Property="BorderThickness" Value="3,0,0,0"/></Style>
+    <Style Selector="Border.sourceFolder.sourceSelected"><Setter Property="Background" Value="#24445E"/><Setter Property="BorderBrush" Value="#5EA8E0"/></Style>
+    <Style Selector="Border.sourceImage"><Setter Property="Height" Value="30"/><Setter Property="Padding" Value="5,0"/><Setter Property="CornerRadius" Value="3"/><Setter Property="BorderBrush" Value="Transparent"/><Setter Property="BorderThickness" Value="3,0,0,0"/><Setter Property="ClipToBounds" Value="True"/></Style>
+    <Style Selector="Border.sourceImage:pointerover"><Setter Property="Background" Value="#272C30"/></Style>
+    <Style Selector="Border.sourceImage.currentImage"><Setter Property="Background" Value="#5A3829"/><Setter Property="BorderBrush" Value="#FF9C63"/></Style>
+    <Style Selector="Border.dropTarget.dragOver"><Setter Property="BorderBrush" Value="#FF9C63"/><Setter Property="BorderThickness" Value="2"/><Setter Property="Background" Value="#5A3829"/></Style>
+    <Style Selector="Border.destinationCard"><Setter Property="Width" Value="184"/><Setter Property="Height" Value="66"/><Setter Property="Margin" Value="4"/><Setter Property="Padding" Value="9"/><Setter Property="Background" Value="#1B1F22"/><Setter Property="BorderBrush" Value="#33383C"/><Setter Property="BorderThickness" Value="1"/><Setter Property="CornerRadius" Value="7"/></Style>
+    <Style Selector="Border.destinationCard:pointerover"><Setter Property="Background" Value="#24282B"/><Setter Property="BorderBrush" Value="#76513D"/></Style>
+    <Style Selector="Border.destinationCard.reorderOver"><Setter Property="Background" Value="#294151"/><Setter Property="BorderThickness" Value="2"/></Style>
+    <Style Selector="Button.badge"><Setter Property="MinWidth" Value="32"/><Setter Property="Height" Value="25"/><Setter Property="Padding" Value="4,0"/><Setter Property="VerticalAlignment" Value="Center"/><Setter Property="FontSize" Value="10"/><Setter Property="FontWeight" Value="Bold"/><Setter Property="Background" Value="#24282B"/><Setter Property="BorderBrush" Value="#484E52"/><Setter Property="BorderThickness" Value="1"/><Setter Property="CornerRadius" Value="4"/></Style>
+    <Style Selector="GridSplitter"><Setter Property="Background" Value="#2A2E32"/></Style><Style Selector="GridSplitter:pointerover"><Setter Property="Background" Value="#EF8F5A"/></Style>
+  </Window.Styles>
+  <Grid RowDefinitions="48,*,26">
+    <Border Grid.Row="0" Background="#151719" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,0,1">
+      <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto" Margin="10,7">
+        <Button Grid.Column="0" Classes="tool primary" Click="OpenSourceClick"><StackPanel Orientation="Horizontal" Spacing="7"><TextBlock Text="▣"/><TextBlock Text="Open source"/></StackPanel></Button>
+        <Button Grid.Column="1" Classes="tool" Margin="6,0,0,0" Click="AddDestinationClick"><StackPanel Orientation="Horizontal" Spacing="7"><TextBlock Text="＋"/><TextBlock Text="Add sorting folder"/></StackPanel></Button>
+        <Button Grid.Column="2" Classes="tool" Margin="6,0,0,0" Click="UndoClick"><StackPanel Orientation="Horizontal" Spacing="7"><TextBlock Text="↶"/><TextBlock Text="Undo"/></StackPanel></Button>
+        <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center" Spacing="8"><TextBlock Text="On collision" Foreground="{StaticResource MutedBrush}" FontSize="10" VerticalAlignment="Center"/><ComboBox x:Name="CollisionBox" Width="110" Height="31" SelectedIndex="0"><ComboBoxItem Content="Keep both"/><ComboBoxItem Content="Skip"/><ComboBoxItem Content="Replace"/></ComboBox></StackPanel>
+      </Grid>
+    </Border>
+    <Grid Grid.Row="1" x:Name="Workspace">
+      <Grid.ColumnDefinitions><ColumnDefinition Width="278"/><ColumnDefinition Width="5"/><ColumnDefinition Width="*"/><ColumnDefinition Width="5"/><ColumnDefinition Width="238"/></Grid.ColumnDefinitions>
+      <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="5"/><RowDefinition Height="180"/></Grid.RowDefinitions>
+      <Border Grid.Column="0" Grid.RowSpan="3" Background="{StaticResource PanelBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,1,0">
+        <Grid RowDefinitions="*,*">
+          <Grid x:Name="SourcePane" Grid.Row="0" RowDefinitions="39,*"><Border BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,0,1"><Grid ColumnDefinitions="*,Auto" Margin="10,0"><TextBlock Classes="section" Text="SOURCE" VerticalAlignment="Center"/><TextBlock x:Name="SourceCountText" Grid.Column="1" Text="0" Foreground="#7B8287" VerticalAlignment="Center" FontSize="9"/></Grid></Border>
+            <TreeView x:Name="SourceTree" Grid.Row="1" SelectionChanged="SourceTreeSelectionChanged"><TreeView.DataTemplates><TreeDataTemplate DataType="{x:Type local:FolderNode}" ItemsSource="{Binding SourceChildren}"><Border Classes="folderRow sourceFolder" Classes.sourceSelected="{Binding IsSourceSelected}" Tag="{Binding Path}"><Grid ColumnDefinitions="23,*,Auto"><TextBlock Text="▱" Foreground="#AAB0B4" VerticalAlignment="Center" FontSize="15"/><TextBlock Grid.Column="1" Text="{Binding Name}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" FontSize="13"/><TextBlock Grid.Column="2" Text="{Binding ImageCount}" Foreground="#8A9298" FontSize="11" VerticalAlignment="Center" Margin="8,0"/></Grid><Border.ContextMenu><ContextMenu><MenuItem Header="New subfolder" Click="NewSubfolderClick" CommandParameter="{Binding Path}"/><MenuItem Header="Rename folder" Click="RenameFolderClick" CommandParameter="{Binding Path}"/><MenuItem Header="Delete empty folder" Click="DeleteFolderClick" CommandParameter="{Binding Path}"/></ContextMenu></Border.ContextMenu></Border></TreeDataTemplate><DataTemplate DataType="{x:Type local:ImageNode}"><Border Classes="sourceImage" Classes.currentImage="{Binding IsCurrent}" Tag="{Binding Path}" ToolTip.Tip="{Binding Path}"><Grid ColumnDefinitions="23,*"><TextBlock Text="▧" Foreground="#EF8F5A" VerticalAlignment="Center" FontSize="14"/><TextBlock Grid.Column="1" Text="{Binding Name}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" FontSize="12"/></Grid></Border></DataTemplate></TreeView.DataTemplates></TreeView>
+          </Grid>
+          <Grid Grid.Row="1" RowDefinitions="39,*"><Border BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,1"><Grid ColumnDefinitions="*,Auto" Margin="10,0"><TextBlock Classes="section" Text="SORTING FOLDERS" VerticalAlignment="Center"/><TextBlock x:Name="DestinationCountText" Grid.Column="1" Text="0" Foreground="#7B8287" VerticalAlignment="Center" FontSize="9"/></Grid></Border>
+            <TreeView x:Name="DestinationTree" Grid.Row="1"><TreeView.ItemTemplate><TreeDataTemplate DataType="{x:Type local:FolderNode}" ItemsSource="{Binding Children}"><Border Classes="folderRow dropTarget" Tag="{Binding Path}"><Grid ColumnDefinitions="23,*,Auto"><TextBlock Text="▱" Foreground="#EF8F5A" VerticalAlignment="Center" FontSize="15"/><TextBlock Grid.Column="1" Text="{Binding Name}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" FontSize="13"/><TextBlock Grid.Column="2" Text="{Binding ImageCount}" Foreground="#8A9298" FontSize="11" VerticalAlignment="Center" Margin="8,0"/></Grid><Border.ContextMenu><ContextMenu><MenuItem Header="New subfolder" Click="NewSubfolderClick" CommandParameter="{Binding Path}"/><MenuItem Header="Rename folder" Click="RenameFolderClick" CommandParameter="{Binding Path}"/><MenuItem Header="Delete empty folder" Click="DeleteFolderClick" CommandParameter="{Binding Path}"/><Separator/><MenuItem Header="Remove sorting root" Click="RemoveDestinationClick" CommandParameter="{Binding Path}"/></ContextMenu></Border.ContextMenu></Border></TreeDataTemplate></TreeView.ItemTemplate></TreeView>
+          </Grid>
+        </Grid>
+      </Border>
+      <GridSplitter Grid.Column="1" Grid.RowSpan="3" ResizeDirection="Columns"/>
+      <Border Grid.Column="2" Grid.Row="0" Background="{StaticResource CheckerBrush}" ClipToBounds="True"><Grid x:Name="PreviewHost" Background="Transparent" PointerWheelChanged="PreviewWheelChanged" PointerReleased="PreviewHostPointerReleased"><Image x:Name="PreviewImage" Stretch="Uniform" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="34,28,34,62" Cursor="Hand" PointerPressed="PreviewPointerPressed" IsVisible="False"/>
+        <StackPanel x:Name="EmptyState" HorizontalAlignment="Center" VerticalAlignment="Center" Width="390" Spacing="9"><Border Width="72" Height="72" CornerRadius="17" BorderBrush="#34393E" BorderThickness="1" Background="#171A1D" HorizontalAlignment="Center"><TextBlock Text="▧" FontSize="29" Foreground="#646C71" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border><TextBlock x:Name="EmptyTitle" Text="Start with a source folder" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock x:Name="EmptyMessage" Text="Open a folder containing images to begin." Foreground="#858B90" FontSize="11" TextAlignment="Center" TextWrapping="Wrap"/></StackPanel>
+        <Border x:Name="LoadingOverlay" IsVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center" Background="#202428" BorderBrush="#EF8F5A" BorderThickness="1" CornerRadius="8" Padding="18,12"><StackPanel Orientation="Horizontal" Spacing="9"><ProgressBar IsIndeterminate="True" Width="36"/><TextBlock x:Name="LoadingText" Text="Loading images…" VerticalAlignment="Center" FontSize="11"/></StackPanel></Border>
+        <Border HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,14" Background="#191C1F" BorderBrush="#3A4044" BorderThickness="1" CornerRadius="8" Padding="4"><StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="3"><Button Classes="tool" Width="34" Padding="0" Click="PreviousClick" Content="‹"/><TextBlock x:Name="PositionText" Text="0 / 0" Width="78" TextAlignment="Center" VerticalAlignment="Center" FontSize="11"/><Button Classes="tool" Width="34" Padding="0" Click="NextClick" Content="›"/><Border Width="1" Height="21" Background="#3A4044" Margin="3,0" VerticalAlignment="Center"/><Button Classes="tool" Width="34" Padding="0" Click="ZoomOutClick" Content="−"/><Button Classes="tool" Width="52" Padding="0" Click="ResetZoomClick"><TextBlock x:Name="ZoomText" Text="100%" VerticalAlignment="Center" FontSize="10"/></Button><Button Classes="tool" Width="34" Padding="0" Click="ZoomInClick" Content="＋"/></StackPanel></Border>
+      </Grid></Border>
+      <GridSplitter Grid.Column="3" Grid.RowSpan="3" ResizeDirection="Columns"/>
+      <Button x:Name="LeftPaneToggle" Grid.Column="2" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Width="18" Height="48" Padding="0" Margin="0" Content="‹" Click="ToggleLeftPaneClick" ZIndex="20"/>
+      <Button x:Name="RightPaneToggle" Grid.Column="2" Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Width="18" Height="48" Padding="0" Margin="0" Content="›" Click="ToggleRightPaneClick" ZIndex="20"/>
+      <Border Grid.Column="4" Grid.RowSpan="3" Background="{StaticResource PanelBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1,0,0,0"><Grid RowDefinitions="39,*"><Border BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,0,1"><TextBlock Classes="section" Text="IMAGE PROPERTIES" Margin="10,0" VerticalAlignment="Center"/></Border><StackPanel Grid.Row="1" Margin="12" Spacing="10">
+        <Grid ColumnDefinitions="94,*"><TextBlock Text="Name" Foreground="{StaticResource MutedBrush}" FontSize="12"/><TextBlock x:Name="PropertyName" Grid.Column="1" Text="—" TextTrimming="CharacterEllipsis" TextAlignment="Right" FontSize="12" FontWeight="SemiBold"/></Grid><Grid ColumnDefinitions="94,*"><TextBlock Text="Dimensions" Foreground="{StaticResource MutedBrush}" FontSize="12"/><TextBlock x:Name="PropertyDimensions" Grid.Column="1" Text="—" TextAlignment="Right" FontSize="12" FontWeight="SemiBold"/></Grid><Grid ColumnDefinitions="94,*"><TextBlock Text="File size" Foreground="{StaticResource MutedBrush}" FontSize="12"/><TextBlock x:Name="PropertySize" Grid.Column="1" Text="—" TextAlignment="Right" FontSize="12" FontWeight="SemiBold"/></Grid><Grid ColumnDefinitions="94,*"><TextBlock Text="Modified" Foreground="{StaticResource MutedBrush}" FontSize="12"/><TextBlock x:Name="PropertyModified" Grid.Column="1" Text="—" TextAlignment="Right" FontSize="12" FontWeight="SemiBold"/></Grid><TextBlock Text="Full path" Foreground="{StaticResource MutedBrush}" FontSize="12" Margin="0,8,0,0"/><TextBlock x:Name="PropertyPath" Text="—" TextWrapping="Wrap" Foreground="#B8BDC1" FontSize="11"/>
+      </StackPanel></Grid></Border>
+      <GridSplitter Grid.Column="2" Grid.Row="1" ResizeDirection="Rows"/>
+      <Border Grid.Column="2" Grid.Row="2" Background="#15181A" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,0"><Grid RowDefinitions="32,*"><Border BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,0,1"><Grid ColumnDefinitions="*,Auto,Auto"><Button Grid.Column="0" Background="Transparent" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" Padding="0" Click="ToggleTrayClick"><Grid ColumnDefinitions="28,*" VerticalAlignment="Center"><Path x:Name="TrayChevron" Grid.Column="0" Width="10" Height="6" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="#AEB3B7" StrokeThickness="1.5" Stretch="Fill" Data="M 0,0 L 5,5 L 10,0" RenderTransformOrigin="50%,50%"/><TextBlock Grid.Column="1" Classes="section" Text="DESTINATION TRAY" VerticalAlignment="Center"/></Grid></Button><Button Grid.Column="1" Classes="tool" Height="28" VerticalAlignment="Center" Click="SortDestinationsClick" Content="Sort A–Z"/><Button Grid.Column="2" Classes="tool" Height="28" VerticalAlignment="Center" Click="ClearDestinationsClick" Margin="0,0,7,0" Content="Clear sorting folders"/></Grid></Border>
+        <ScrollViewer x:Name="TrayScroll" Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+          <ItemsControl x:Name="DestinationCards" SizeChanged="DestinationCardsSizeChanged">
+            <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="{x:Type local:DestinationTarget}">
+                <Border Classes="destinationCard dropTarget" Width="{Binding CardWidth}" BorderBrush="{Binding BorderColor}" Tag="{Binding Path}" PointerPressed="DestinationCardPointerPressed" PointerReleased="DestinationCardPointerReleased">
+                  <Grid ColumnDefinitions="Auto,26,*" ColumnSpacing="7">
+                    <Button Grid.Column="0" Classes="badge" Content="{Binding Shortcut}" Tag="{Binding}" Click="ShortcutBadgeClick"/>
+                    <TextBlock Grid.Column="1" Text="▱" Foreground="{Binding Color}" FontSize="17" VerticalAlignment="Center"/>
+                    <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="4">
+                      <TextBlock Text="{Binding Name}" FontSize="11" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                      <TextBlock Text="{Binding Path}" Foreground="#747C82" FontSize="8" TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+                  </Grid>
+                  <Border.ContextMenu>
+                    <ContextMenu>
+                      <MenuItem Header="New subfolder" Click="NewSubfolderClick" CommandParameter="{Binding Path}"/>
+                      <MenuItem Header="Rename folder" Click="RenameFolderClick" CommandParameter="{Binding Path}"/>
+                      <MenuItem Header="Delete empty folder" Click="DeleteFolderClick" CommandParameter="{Binding Path}"/>
+                      <Separator/>
+                      <MenuItem Header="Folder color">
+                        <MenuItem Header="Orange" Foreground="#EF8F5A" Tag="#EF8F5A" CommandParameter="{Binding}" Click="ChangeDestinationColorClick"/>
+                        <MenuItem Header="Blue" Foreground="#5AA7EF" Tag="#5AA7EF" CommandParameter="{Binding}" Click="ChangeDestinationColorClick"/>
+                        <MenuItem Header="Green" Foreground="#70C99A" Tag="#70C99A" CommandParameter="{Binding}" Click="ChangeDestinationColorClick"/>
+                        <MenuItem Header="Purple" Foreground="#D28BEF" Tag="#D28BEF" CommandParameter="{Binding}" Click="ChangeDestinationColorClick"/>
+                        <MenuItem Header="Yellow" Foreground="#E3C255" Tag="#E3C255" CommandParameter="{Binding}" Click="ChangeDestinationColorClick"/>
+                        <MenuItem Header="Pink" Foreground="#ED7090" Tag="#ED7090" CommandParameter="{Binding}" Click="ChangeDestinationColorClick"/>
+                        <MenuItem Header="Cyan" Foreground="#55C7D9" Tag="#55C7D9" CommandParameter="{Binding}" Click="ChangeDestinationColorClick"/>
+                        <MenuItem Header="Gray" Foreground="#9AA1A6" Tag="#9AA1A6" CommandParameter="{Binding}" Click="ChangeDestinationColorClick"/>
+                      </MenuItem>
+                      <Separator/>
+                      <MenuItem Header="Remove sorting root" Click="RemoveDestinationClick" CommandParameter="{Binding Path}"/>
+                    </ContextMenu>
+                  </Border.ContextMenu>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </Grid></Border>
+    </Grid>
+    <Canvas x:Name="DragAdorner" Grid.Row="1" IsVisible="False" IsHitTestVisible="False" ZIndex="1000">
+      <Border x:Name="DragThumbnail" Width="120" Height="150" Background="{StaticResource CheckerBrush}" BorderBrush="#EF8F5A" BorderThickness="2" CornerRadius="7" ClipToBounds="True" Opacity="0.9">
+        <Image x:Name="DragThumbnailImage" Stretch="Uniform"/>
+      </Border>
+    </Canvas>
+    <Canvas x:Name="ReorderAdorner" Grid.Row="1" IsVisible="False" IsHitTestVisible="False" ZIndex="1001">
+      <Border x:Name="ReorderPreview" Width="190" Height="50" Padding="11,0" Background="#202529" BorderBrush="#5AA7EF" BorderThickness="2" CornerRadius="7" Opacity="0.92">
+        <Grid ColumnDefinitions="25,*"><TextBlock Text="▱" Foreground="#5AA7EF" FontSize="17" VerticalAlignment="Center"/><TextBlock x:Name="ReorderPreviewName" Grid.Column="1" VerticalAlignment="Center" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/></Grid>
+      </Border>
+    </Canvas>
+    <Border Grid.Row="2" Background="#111315" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,0"><Grid ColumnDefinitions="*,170,*" Margin="10,0"><TextBlock x:Name="StatusText" Text="Choose a source folder to begin" Foreground="#858C91" FontSize="10" VerticalAlignment="Center"/><ProgressBar x:Name="Progress" Grid.Column="1" Height="2" Minimum="0" Maximum="1"/><TextBlock x:Name="StatusFile" Grid.Column="2" Text="No image" Foreground="#858C91" FontSize="10" TextAlignment="Right" VerticalAlignment="Center"/></Grid></Border>
+  </Grid>
+</Window>

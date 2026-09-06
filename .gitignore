@@ -1,0 +1,39 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+[Pp]ublish/
+[Pp]ackages/
+[Rr]elease-[Aa]ssets/
+[Aa]rtifacts/
+AvaloniaUI/BuildServices/
+
+# Test output
+[Tt]est[Rr]esults/
+*.trx
+*.coverage
+*.coveragexml
+
+# IDE and user-specific files
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# JetBrains Rider
+*.sln.iml
+
+# Operating-system files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+~$*
