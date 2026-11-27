@@ -1,3 +1,12 @@
+## What's new in 1.1.0
+
+- Added recognition of JFIF (`.jfif`) and JPE (`.jpe`) JPEG images.
+- Added ICO (`.ico`) image previews and APNG (`.apng`) animated previews.
+- Included the new formats in image scanning and folder image counts.
+- Added decoding tests for JPE, PNG- and BMP-based ICO files, and APNG animation frames.
+
+AVIF and HEIC/HEIF remain excluded pending verified decoder support.
+
 ## Download and install
 
 Choose the file for your computer below. You do not need to install .NET.

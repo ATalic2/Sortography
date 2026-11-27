@@ -263,6 +263,7 @@ public partial class MainWindow
             var extension = Path.GetExtension(current.Path);
             if (extension.Equals(".gif", StringComparison.OrdinalIgnoreCase) ||
                 extension.Equals(".png", StringComparison.OrdinalIgnoreCase) ||
+                extension.Equals(".apng", StringComparison.OrdinalIgnoreCase) ||
                 extension.Equals(".webp", StringComparison.OrdinalIgnoreCase))
             {
                 _animationStream = new MemoryStream(File.ReadAllBytes(current.Path), writable: false);

@@ -18,5 +18,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Sortography.csproj" />
+    <None Update="Fixtures\**\*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

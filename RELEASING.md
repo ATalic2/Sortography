@@ -13,8 +13,8 @@ Install and launch each package on its target system. Check that you can open a 
 From the tested commit:
 
 ```sh
-git tag v1.0.0
-git push origin v1.0.0
+git tag v1.1.0
+git push origin v1.1.0
 ```
 
 Use a new `vMAJOR.MINOR.PATCH` tag for each release, or a prerelease such as `v1.1.0-beta.1`. The tag sets the application and installer versions. Prerelease tags produce GitHub prereleases. Do not reuse a published version. The repository's Actions settings must allow the workflow's `contents: write` permission to create releases.

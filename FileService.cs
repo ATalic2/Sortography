@@ -6,7 +6,7 @@ namespace Sortography;
 public sealed class FileService
 {
     private static readonly HashSet<string> Extensions = new(StringComparer.OrdinalIgnoreCase)
-        { ".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp", ".tif", ".tiff" };
+        { ".jpg", ".jpeg", ".jpe", ".jfif", ".png", ".apng", ".gif", ".webp", ".bmp", ".ico", ".tif", ".tiff" };
     private readonly Stack<UndoRecord> _undo = new();
 
     public Task<List<ImageItem>> ScanImagesAsync(string path) => Task.Run(() =>

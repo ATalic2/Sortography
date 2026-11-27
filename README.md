@@ -21,6 +21,8 @@ Maintainers: see [Making a release](RELEASING.md) for testing packages and publi
 
 ## Sort Photos
 
+Recognized extensions: `.jpg`, `.jpeg`, `.jpe`, `.jfif`, `.png`, `.apng`, `.gif`, `.webp`, `.bmp`, `.ico`, `.tif`, and `.tiff` (case-insensitive). APNG files use the animated preview. AVIF and HEIC/HEIF are not enabled.
+
 1. Click **Open source** and choose the folder containing the photos you want to sort.
 2. Click **Add sorting folder** and choose a destination folder. Add as many destinations as you need.
 3. Select a photo in the source list or preview it in the center of the window.
